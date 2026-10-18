@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#062a30" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="鹈鹕海岸线 · Pelican Coast — 骑着自行车的鹈鹕，沿着被潮汐擦亮的海岸公路骑两圈。"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23082f34'/%3E%3Cpath d='M7 21c3-7 8-9 13-8l3-4 2 5c1 3-1 6-5 6h-7c-3 0-4 0-6 1z' fill='%23f6ecd8'/%3E%3Cpath d='M9 25c4-1 8-1 14 0' stroke='%2357c7b8' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <title>鹈鹕海岸线 · Pelican Coast</title>
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="game-canvas" aria-label="鹈鹕海岸线游戏画面"></canvas>
+
+      <div id="hud-root" data-phase="title">
+        <!-- ── Inline icon sprite (no external assets) ───────────────────── -->
+        <svg class="svg-sprite" aria-hidden="true" focusable="false">
+          <defs>
+            <symbol id="ico-sun" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4.1" />
+              <path
+                d="M12 2.3v2.3M12 19.4v2.3M2.3 12h2.3M19.4 12h2.3M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"
+              />
+            </symbol>
+            <symbol id="ico-cloud" viewBox="0 0 24 24">
+              <path d="M7.1 18.2h9.6a3.7 3.7 0 0 0 .4-7.4 5.3 5.3 0 0 0-10.2-1.2 4.1 4.1 0 0 0 .2 8.6Z" />
+            </symbol>
+            <symbol id="ico-rain" viewBox="0 0 24 24">
+              <path d="M7.1 15.4h9.6a3.7 3.7 0 0 0 .4-7.4A5.3 5.3 0 0 0 6.9 6.8a4.1 4.1 0 0 0 .2 8.6Z" />
+              <path d="M8.4 18.2 7.5 20.4M12.4 18.2l-.9 2.2M16.4 18.2l-.9 2.2" />
+            </symbol>
+            <symbol id="ico-storm" viewBox="0 0 24 24">
+              <path d="M7.1 14.8h9.6a3.7 3.7 0 0 0 .4-7.4A5.3 5.3 0 0 0 6.9 6.2a4.1 4.1 0 0 0 .2 8.6Z" />
+              <path d="m12.9 14.6-2.4 3.9h2.5l-.9 3 3.4-4.6h-2.4l1.1-2.3z" />
+            </symbol>
+            <symbol id="ico-fog" viewBox="0 0 24 24">
+              <circle cx="12" cy="8.2" r="3.2" />
+              <path d="M3.6 14.4h13.2M6.8 17.6h13M4.4 20.8h11.4" />
+            </symbol>
+            <symbol id="ico-shell" viewBox="0 0 24 24">
+              <path
+                d="M12 20.4c-5.1 0-8.2-3.5-8.2-7.4C3.8 7.5 7.5 3.8 12 3.8s8.2 3.7 8.2 9.2c0 3.9-3.1 7.4-8.2 7.4Z"
+              />
+              <path d="M12 20.4V8.6M8.1 19.5l1.1-8M15.9 19.5l-1.1-8M5.2 16.7 7.9 10M18.8 16.7 16.1 10" />
+            </symbol>
+            <symbol id="ico-heart" viewBox="0 0 24 24">
+              <path d="M12 20.6 4.5 13a4.8 4.8 0 0 1 6.8-6.8l.7.7.7-.7A4.8 4.8 0 0 1 19.5 13Z" />
+            </symbol>
+            <symbol id="ico-sound-on" viewBox="0 0 24 24">
+              <path d="M4 9.6h3.2L12 6.2v11.6l-4.8-3.4H4z" />
+              <path d="M15.2 8.8a4.8 4.8 0 0 1 0 6.4M17.6 6.2a8.2 8.2 0 0 1 0 11.6" />
+            </symbol>
+            <symbol id="ico-sound-off" viewBox="0 0 24 24">
+              <path d="M4 9.6h3.2L12 6.2v11.6l-4.8-3.4H4z" />
+              <path d="m15.6 9.6 4.2 4.8M19.8 9.6l-4.2 4.8" />
+            </symbol>
+            <symbol id="ico-pause" viewBox="0 0 24 24">
+              <path d="M8.8 5.6v12.8M15.2 5.6v12.8" />
+            </symbol>
+            <symbol id="ico-play" viewBox="0 0 24 24">
+              <path d="M8.4 5.4 19 12 8.4 18.6Z" fill="currentColor" stroke="none" />
+            </symbol>
+            <symbol id="ico-restart" viewBox="0 0 24 24">
+              <path d="M4.6 12a7.4 7.4 0 1 0 2.1-5.2" />
+              <path d="M4.4 4.4v4.4h4.4" />
+            </symbol>
+            <symbol id="ico-flag" viewBox="0 0 24 24">
+              <path d="M6.2 20.2V4M6.2 4.8h11.4l-2.5 3.1 2.5 3.1H6.2" />
+            </symbol>
+            <symbol id="ico-pedal" viewBox="0 0 24 24">
+              <path d="m6.4 8.6 5.6 5.6 5.6-5.6M6.4 14.6l5.6 5.6 5.6-5.6" />
+            </symbol>
+            <symbol id="ico-brake" viewBox="0 0 24 24">
+              <path d="M8.4 3.4h7.2l5 5v7.2l-5 5H8.4l-5-5V8.4z" />
+              <path d="M8.2 12h7.6" />
+            </symbol>
+            <symbol id="ico-camera" viewBox="0 0 24 24">
+              <path d="M3.2 7.2h3.6l1.5-2.1h7.4l1.5 2.1h3.6a1.2 1.2 0 0 1 1.2 1.2v9.4a1.2 1.2 0 0 1-1.2 1.2H3.2A1.2 1.2 0 0 1 2 17.8V8.4a1.2 1.2 0 0 1 1.2-1.2Z" />
+              <circle cx="12" cy="12.8" r="3.7" />
+              <path d="M18.4 10.2h.01" />
+            </symbol>
+            <symbol id="ico-boost" viewBox="0 0 24 24">
+              <path d="M3.8 9.6h9.4a2.5 2.5 0 1 0-2.5-2.5M3.8 14h12.6a2.3 2.3 0 1 1-2.3 2.3M3.8 18.4h6.8" />
+            </symbol>
+          </defs>
+        </svg>
+
+        <div class="hud-grain" aria-hidden="true"></div>
+        <div class="hud-vignette" aria-hidden="true"></div>
+
+        <!-- ── Live HUD chrome ──────────────────────────────────────────── -->
+        <div class="hud-chrome">
+          <!-- Top-left: lap / checkpoint / time / shells / score -->
+          <header class="hud-top-left">
+            <div class="instrument cut">
+              <div class="lap-row">
+                <div class="lap-block">
+                  <span class="micro">LAP · 圈数</span>
+                  <div class="lap-num">
+                    <b class="num" id="lap-value">01</b>
+                    <span class="lap-slash">/</span>
+                    <span class="lap-total num" id="lap-total">02</span>
+                  </div>
+                </div>
+                <div class="lap-times">
+                  <div class="time-line">
+                    <span class="micro">RIDE</span>
+                    <b class="num" id="ride-time">00:00.0</b>
+                  </div>
+                  <div class="time-line">
+                    <span class="micro">LAP</span>
+                    <b class="num" id="lap-time">00:00.0</b>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cp-row">
+                <div
+                  class="cp-bar"
+                  role="progressbar"
+                  aria-label="赛段进度"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                >
+                  <span class="cp-fill" id="cp-fill"></span>
+                  <span class="cp-ticks" aria-hidden="true"></span>
+                </div>
+                <div class="cp-meta">
+                  <span class="micro">NEXT CHECKPOINT</span>
+                  <span class="cp-dist"><b class="num" id="cp-dist">0.00</b><small>KM</small></span>
+                </div>
+              </div>
+
+              <div class="loot-row">
+                <div class="loot loot-shells">
+                  <svg class="ico shell-ico" aria-hidden="true"><use href="#ico-shell" /></svg>
+                  <b class="num" id="shell-value">0</b>
+                  <span class="micro">SHELLS</span>
+                </div>
+                <div class="loot loot-score">
+                  <span class="micro">SCORE</span>
+                  <b class="num" id="score-value">0</b>
+                </div>
+              </div>
+              <span class="instrument-notch" aria-hidden="true"></span>
+            </div>
+          </header>
+
+          <!-- Top-right: weather, clock, day phase, wind compass, controls -->
+          <header class="hud-top-right">
+            <div class="tr-icons">
+              <button class="icon-btn" type="button" id="camera-button" aria-label="切换视角，当前追尾" title="切换视角 · 追尾 (C)">
+                <svg class="ico" aria-hidden="true"><use href="#ico-camera" /></svg>
+              </button>
+              <button class="icon-btn" type="button" data-action="sound" aria-label="切换声音" aria-pressed="true">
+                <svg class="ico ico-sound" aria-hidden="true"><use href="#ico-sound-on" /></svg>
+                <svg class="ico ico-muted" aria-hidden="true"><use href="#ico-sound-off" /></svg>
+              </button>
+              <button class="icon-btn" type="button" id="pause-button" data-action="pause" aria-label="暂停游戏">
+                <svg class="ico" aria-hidden="true"><use href="#ico-pause" /></svg>
+              </button>
+            </div>
+
+            <div class="tr-weather">
+              <svg class="wx-icon" aria-hidden="true"><use id="wx-icon" href="#ico-sun" /></svg>
+              <div class="wx-text">
+                <b id="weather-label">CLEAR</b>
+                <span class="micro" id="day-label">GOLDEN HOUR</span>
+              </div>
+              <div class="clock-block">
+                <b class="num" id="clock-value">18:42</b>
+                <div class="day-track" aria-hidden="true">
+                  <span class="day-line"></span>
+                  <i class="day-dot" id="day-dot"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="tr-wind">
+              <div class="wind-compass" aria-hidden="true">
+                <svg viewBox="0 0 64 64" class="compass-svg">
+                  <circle cx="32" cy="32" r="27" class="compass-ring" />
+                  <circle cx="32" cy="32" r="21.5" class="compass-ring is-faint" />
+                  <path d="M32 3.5v4M32 56.5v4M3.5 32h4M56.5 32h4" class="compass-ticks" />
+                  <text x="32" y="16.4" class="compass-letter">N</text>
+                  <text x="32" y="51.2" class="compass-letter">S</text>
+                  <text x="13.2" y="34.6" class="compass-letter">W</text>
+                  <text x="50.8" y="34.6" class="compass-letter">E</text>
+                </svg>
+                <i class="wind-needle" id="wind-needle" aria-hidden="true"></i>
+                <span class="wind-lubber" aria-hidden="true"></span>
+              </div>
+              <div class="wind-nums">
+                <div class="wind-primary">
+                  <span class="micro">WIND</span>
+                  <b class="num" id="wind-value">0</b>
+                  <small>KM/H</small>
+                </div>
+                <div class="wind-secondary">
+                  <span class="micro">GUST</span>
+                  <b class="num" id="gust-value">0</b>
+                  <span class="wind-dir num" id="wind-dir">N 000°</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Bottom-left: hearts / combo / best -->
+          <section class="hud-bottom-left">
+            <div class="hearts" id="hearts" role="img" aria-label="剩余生命 3">
+              <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-heart" /></svg>
+              <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-heart" /></svg>
+              <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-heart" /></svg>
+            </div>
+            <div class="combo is-idle" id="combo">
+              <span class="combo-x" aria-hidden="true">×</span>
+              <b class="num" id="combo-value">0</b>
+              <span class="micro">COMBO</span>
+            </div>
+            <div class="best-line">
+              <span class="micro">BEST</span>
+              <b class="num" id="best-value">0</b>
+            </div>
+          </section>
+
+          <!-- Bottom-right: speedometer -->
+          <section class="hud-speedo" aria-label="速度表">
+            <svg class="speedo-svg" viewBox="0 0 240 240" aria-hidden="true">
+              <defs>
+                <radialGradient id="speedo-glass" cx="36%" cy="28%" r="82%">
+                  <stop offset="0" stop-color="#f6ecd8" stop-opacity="0.14" />
+                  <stop offset="0.34" stop-color="#062a30" stop-opacity="0.3" />
+                  <stop offset="0.72" stop-color="#041b20" stop-opacity="0.42" />
+                  <stop offset="1" stop-color="#03181c" stop-opacity="0.64" />
+                </radialGradient>
+                <linearGradient id="speedo-boost" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0" stop-color="#57c7b8" />
+                  <stop offset="0.62" stop-color="#f6b756" />
+                  <stop offset="1" stop-color="#ff6b4a" />
+                </linearGradient>
+              </defs>
+              <circle cx="120" cy="120" r="118" fill="url(#speedo-glass)" />
+              <circle cx="120" cy="120" r="117" class="speedo-rim" />
+              <path d="" id="speedo-track" class="speedo-track" pathLength="100" />
+              <path d="" id="speed-arc" class="speed-arc" pathLength="100" />
+              <path d="" id="boost-arc" class="boost-arc" pathLength="100" />
+              <g id="speed-ticks"></g>
+              <g id="speed-labels"></g>
+              <g id="speed-max-mark" class="speed-max-mark">
+                <path d="M120 21.5 125.4 31h-10.8Z" />
+              </g>
+              <g id="speed-needle" class="speed-needle">
+                <line x1="184" y1="120" x2="216" y2="120" />
+                <circle cx="216" cy="120" r="3.4" />
+              </g>
+            </svg>
+            <div class="speedo-center">
+              <b class="num" id="speed-value">0</b>
+              <span class="speedo-unit">KM/H</span>
+            </div>
+            <div class="speedo-foot">
+              <span class="micro">TAILWIND</span>
+              <b class="num" id="boost-value">0%</b>
+            </div>
+          </section>
+
+          <!-- Bottom-centre: steering wheel + pads -->
+          <div class="hud-controls">
+            <div class="control-pad-group is-left">
+              <button class="control-pad" id="pedal-pad" type="button" aria-label="蹬踏加速">
+                <svg class="ico" aria-hidden="true"><use href="#ico-pedal" /></svg>
+                <span class="pad-zh">蹬踏</span>
+                <small class="pad-en">PEDAL</small>
+              </button>
+              <span class="pad-hint micro" aria-hidden="true">W · PEDAL</span>
+            </div>
+
+            <div class="wheel-zone">
+              <span class="wheel-hint micro" aria-hidden="true">拖动转向 · DRAG TO STEER</span>
+              <div
+                id="steering-wheel"
+                class="steering-wheel"
+                role="slider"
+                tabindex="0"
+                aria-label="转向方向盘：左右拖动或使用左右方向键"
+                aria-valuemin="-1"
+                aria-valuemax="1"
+                aria-valuenow="0"
+                aria-orientation="horizontal"
+              >
+                <svg class="wheel-svg" viewBox="0 0 240 240" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="wheel-glass" cx="38%" cy="26%" r="82%">
+                      <stop offset="0" stop-color="#f6ecd8" stop-opacity="0.16" />
+                      <stop offset="0.4" stop-color="#083f46" stop-opacity="0.22" />
+                      <stop offset="0.78" stop-color="#041b20" stop-opacity="0.36" />
+                      <stop offset="1" stop-color="#03181c" stop-opacity="0.58" />
+                    </radialGradient>
+                    <linearGradient id="wheel-rim" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#f6ecd8" stop-opacity="0.78" />
+                      <stop offset="0.42" stop-color="#f6ecd8" stop-opacity="0.2" />
+                      <stop offset="1" stop-color="#f6ecd8" stop-opacity="0.58" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="120" cy="120" r="112" class="wheel-halo" />
+                  <circle cx="120" cy="120" r="97" fill="url(#wheel-glass)" />
+                  <circle cx="120" cy="120" r="102" class="wheel-rim-band" />
+                  <circle cx="120" cy="120" r="108" class="wheel-rim-outer" />
+                  <circle cx="120" cy="120" r="96.5" class="wheel-rim-inner" />
+                  <circle cx="120" cy="120" r="90" class="wheel-stitch" />
+                  <g id="wheel-rotor" class="wheel-rotor">
+                    <path d="M22 120H120M120 120H218M120 120V218" class="wheel-spoke-line" />
+                    <path d="M34 115H106M134 115H206M115 140V204" class="wheel-spoke-sheen" />
+                    <circle cx="120" cy="120" r="31" class="wheel-hub" />
+                    <circle cx="120" cy="120" r="25" class="wheel-hub-inner" />
+                    <circle cx="120" cy="120" r="19" class="wheel-hub-ring" />
+                    <text x="120" y="126" class="wheel-monogram" text-anchor="middle">PC</text>
+                    <path d="M14 120h7M219 120h7" class="wheel-grip" />
+                  </g>
+                  <path d="M120 4v14" class="wheel-lubber" />
+                </svg>
+                <span class="wheel-gloss" aria-hidden="true"></span>
+              </div>
+            </div>
+
+            <div class="control-pad-group is-right">
+              <button class="control-pad" id="brake-pad" type="button" aria-label="刹车">
+                <svg class="ico" aria-hidden="true"><use href="#ico-brake" /></svg>
+                <span class="pad-zh">刹车</span>
+                <small class="pad-en">BRAKE</small>
+              </button>
+              <span class="pad-hint micro" aria-hidden="true">S · BRAKE</span>
+            </div>
+          </div>
+
+          <button class="boost-pad" id="boost-pad" type="button" aria-label="尾风冲刺">
+            <svg class="ico" aria-hidden="true"><use href="#ico-boost" /></svg>
+            <span>BOOST</span>
+            <small class="micro">SPACE</small>
+          </button>
+
+          <div class="steer-drag-hint" aria-hidden="true">
+            <span>←</span><b>左右拖动转向</b><span>→</span>
+          </div>
+
+          <!-- Centre feedback -->
+          <div class="hud-center">
+            <div class="checkpoint-banner" id="checkpoint-banner" role="status">
+              <i class="cb-mark" aria-hidden="true"><svg class="ico"><use href="#ico-flag" /></svg></i>
+              <span class="cb-body">
+                <b id="checkpoint-title">CHECKPOINT</b>
+                <small class="num" id="checkpoint-split">00:00.0</small>
+              </span>
+            </div>
+            <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+          </div>
+        </div>
+
+        <!-- ── Screens ─────────────────────────────────────────────────── -->
+        <section class="screen screen-title" data-screen="title" aria-label="开始界面">
+          <div class="screen-scrim is-title"></div>
+          <div class="postcard">
+            <span class="postcard-trim" aria-hidden="true"></span>
+            <header class="postcard-head">
+              <span class="micro postcard-route">COASTAL ROUTE 02 · TWO LAPS</span>
+              <span class="postcard-cancel" aria-hidden="true">
+                <svg viewBox="0 0 120 40">
+                  <path d="M2 11c20 7 40-6 58 0s40 5 58-2M2 21c20 7 40-6 58 0s40 5 58-2M2 31c20 7 40-6 58 0s40 5 58-2" />
+                </svg>
+              </span>
+              <span class="stamp" aria-hidden="true">
+                <span class="stamp-inner">
+                  <svg viewBox="0 0 64 64" class="stamp-bird">
+                    <g class="stamp-bird-fill">
+                      <ellipse cx="26" cy="40" rx="14" ry="9.5" />
+                      <path
+                        d="M31 33c0-9 5-14 12-14 4 0 6 2 7 5l10 1-7 4c2 2 2 5-1 7-4 2-8 2-11 0l-2 7-6-6z"
+                      />
+                    </g>
+                    <circle cx="45" cy="24.5" r="1.6" class="stamp-eye" />
+                    <path d="M20 44c5 3 11 3 16 0" class="stamp-wave" />
+                  </svg>
+                  <span class="stamp-code">PC · 02</span>
+                </span>
+              </span>
+            </header>
+
+            <p class="eyebrow">A SUN-FADED COASTAL POSTCARD</p>
+            <h1 class="lockup">
+              <span class="lockup-word lockup-pelican">PELICAN</span>
+              <span class="lockup-divider" aria-hidden="true"><i></i><b>·</b><i></i></span>
+              <span class="lockup-word lockup-coast">COAST</span>
+            </h1>
+            <p class="cn-title">鹈鹕海岸线</p>
+            <p class="fantasy">沿着被潮汐反复擦亮的海岸公路，骑两圈，把落日和贝壳一起收进车篮。</p>
+
+            <div class="title-actions">
+              <button class="btn btn-primary btn-ride" type="button" data-action="start">
+                <span class="btn-zh">出发</span>
+                <span class="btn-dot" aria-hidden="true">·</span>
+                <span class="btn-en">RIDE</span>
+              </button>
+              <button class="btn btn-ghost btn-sound" type="button" data-action="sound" aria-label="切换声音">
+                <svg class="ico ico-sound" aria-hidden="true"><use href="#ico-sound-on" /></svg>
+                <svg class="ico ico-muted" aria-hidden="true"><use href="#ico-sound-off" /></svg>
+                <span>声音</span>
+              </button>
+            </div>
+
+            <div class="legend">
+              <span class="micro legend-title">CONTROLS · 操控</span>
+              <ul>
+                <li><kbd>←</kbd><kbd>→</kbd><span>转向</span></li>
+                <li><kbd>W</kbd><kbd>↑</kbd><span>蹬踏</span></li>
+                <li><kbd>S</kbd><kbd>↓</kbd><span>刹车</span></li>
+                <li><kbd>SPACE</kbd><span>冲刺</span></li>
+                <li><kbd>P</kbd><span>暂停</span></li>
+                <li><kbd>M</kbd><span>静音</span></li>
+                <li><kbd>C</kbd><span>视角</span></li>
+                <li><kbd>N</kbd><span>快进 3 小时</span></li>
+                <li><kbd>U</kbd><span>隐藏界面</span></li>
+                <li><kbd>B</kbd><span>铃铛</span></li>
+                <li><kbd>T</kbd><span>展翅</span></li>
+              </ul>
+            </div>
+
+            <footer class="postcard-foot">
+              <span class="best-line">
+                <span class="micro">BEST RIDE</span>
+                <b class="num" id="title-best">0</b>
+              </span>
+              <span class="postcard-note micro">SHELLS · TAILWINDS · SALT AIR</span>
+            </footer>
+          </div>
+        </section>
+
+        <section class="screen screen-pause" data-screen="paused" aria-label="暂停">
+          <div class="screen-scrim"></div>
+          <div class="panel cut">
+            <header class="panel-head">
+              <span class="micro panel-eyebrow">INTERMISSION · 间歇</span>
+              <h2 class="panel-title">潮声暂歇</h2>
+              <p class="panel-sub">PAUSED — 风向和潮汐都在等你继续。</p>
+            </header>
+
+            <div class="panel-stats">
+              <div class="stat">
+                <span class="micro">LAP</span>
+                <b class="num"><span id="pause-lap">01</span><small>/<span id="pause-lap-total">02</span></small></b>
+              </div>
+              <div class="stat">
+                <span class="micro">TIME</span>
+                <b class="num" id="pause-time">00:00.0</b>
+              </div>
+              <div class="stat">
+                <span class="micro">SHELLS</span>
+                <b class="num" id="pause-shells">0</b>
+              </div>
+              <div class="stat">
+                <span class="micro">SCORE</span>
+                <b class="num" id="pause-score">0</b>
+              </div>
+            </div>
+
+            <div class="panel-actions is-split">
+              <button class="btn btn-primary" type="button" data-action="resume">
+                <span>继续</span><span class="btn-dot" aria-hidden="true">·</span><span class="btn-en">RESUME</span>
+              </button>
+              <button class="btn btn-outline" type="button" data-action="restart">
+                <span>重新出发</span><span class="btn-dot" aria-hidden="true">·</span><span class="btn-en">RESTART</span>
+              </button>
+              <button class="btn-icon" type="button" data-action="sound" aria-label="切换声音">
+                <svg class="ico ico-sound" aria-hidden="true"><use href="#ico-sound-on" /></svg>
+                <svg class="ico ico-muted" aria-hidden="true"><use href="#ico-sound-off" /></svg>
+              </button>
+            </div>
+            <p class="panel-hint micro">P 继续 · M 静音 · 拖动方向盘转向</p>
+          </div>
+        </section>
+
+        <section class="screen screen-crash" data-screen="crashed" aria-label="翻车">
+          <div class="screen-scrim is-crash"></div>
+          <div class="panel cut crash-panel">
+            <span class="micro panel-eyebrow is-coral">WIPEOUT · 失速</span>
+            <h2 class="panel-title">羽翼沾满了浪花</h2>
+            <p class="panel-sub">一只鹈鹕不会因为一次翻车就放弃落日。调整呼吸，再骑一圈。</p>
+
+            <div class="panel-stats is-compact">
+              <div class="stat">
+                <span class="micro">DISTANCE</span>
+                <b class="num"><span id="crash-distance">0.0</span><small>KM</small></b>
+              </div>
+              <div class="stat">
+                <span class="micro">SHELLS</span>
+                <b class="num" id="crash-shells">0</b>
+              </div>
+              <div class="stat">
+                <span class="micro">SCORE</span>
+                <b class="num" id="crash-score">0</b>
+              </div>
+            </div>
+
+            <div class="panel-actions">
+              <button class="btn btn-primary" type="button" data-action="restart">
+                <span>再来一次</span><span class="btn-dot" aria-hidden="true">·</span><span class="btn-en">RETRY</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen screen-finish" data-screen="finished" aria-label="完赛">
+          <div class="screen-scrim is-finish"></div>
+          <div class="panel cut finish-panel">
+            <header class="panel-head finish-head">
+              <span class="micro panel-eyebrow is-amber">FINISH · 抵达灯塔</span>
+              <h2 class="panel-title">两圈潮声，收藏完毕</h2>
+              <p class="panel-sub" id="finish-sub">LAPS 02/02 — 这条海岸线被你骑成了一张明信片。</p>
+            </header>
+
+            <div class="split-table" aria-label="完赛数据">
+              <div class="split-row">
+                <span>FINAL LAP · 末圈</span>
+                <b class="num" id="finish-lap-time">00:00.0</b>
+              </div>
+              <div class="split-row">
+                <span>TOTAL RIDE · 总时间</span>
+                <b class="num" id="finish-total-time">00:00.0</b>
+              </div>
+              <div class="split-row">
+                <span>DISTANCE · 里程</span>
+                <b class="num"><span id="finish-distance">0.0</span> KM</b>
+              </div>
+              <div class="split-row">
+                <span>SHELLS · 贝壳</span>
+                <b class="num" id="finish-shells">0</b>
+              </div>
+              <div class="split-row is-score">
+                <span>SCORE · 得分</span>
+                <b class="num" id="finish-score">0</b>
+              </div>
+              <div class="split-row is-best">
+                <span>BEST · 最佳</span>
+                <b class="num" id="finish-best">0</b>
+              </div>
+            </div>
+
+            <div class="panel-actions">
+              <button class="btn btn-primary" type="button" data-action="restart">
+                <span>再骑一次</span><span class="btn-dot" aria-hidden="true">·</span><span class="btn-en">RESTART</span>
+              </button>
+              <button class="btn btn-outline" type="button" data-action="sound" aria-label="切换声音">
+                <svg class="ico ico-sound" aria-hidden="true"><use href="#ico-sound-on" /></svg>
+                <svg class="ico ico-muted" aria-hidden="true"><use href="#ico-sound-off" /></svg>
+                <span>声音</span>
+              </button>
+            </div>
+            <span class="finish-seal" aria-hidden="true">POSTED · PELICAN COAST</span>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

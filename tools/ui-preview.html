@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#062a30" />
+    <title>Pelican Coast · UI Preview</title>
+    <style>
+      /* Preview-only stand-in for the 3D coast. NOT shipped player UI. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #041b20;
+      }
+
+      #preview-stage {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        background: #072a30;
+      }
+
+      .pv-sky {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          #093640 0%,
+          #15525c 28%,
+          #4d8a8a 46%,
+          #c9a882 56%,
+          #f2b978 61%,
+          #f6cf95 64.2%,
+          #2c6a6c 64.6%,
+          #123f46 78%,
+          #0a2c33 100%
+        );
+      }
+
+      .pv-sun {
+        position: absolute;
+        top: 49.5%;
+        left: 57%;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(255, 233, 186, 0.95) 0%, rgba(246, 183, 86, 0.5) 34%, rgba(246, 183, 86, 0) 70%);
+        filter: blur(1px);
+      }
+
+      .pv-scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .pv-sea {
+        fill: rgba(9, 46, 52, 0.42);
+      }
+
+      .pv-headland {
+        fill: #0b343b;
+        opacity: 0.72;
+      }
+
+      .pv-cliff {
+        fill: #0a2c33;
+        opacity: 0.92;
+      }
+
+      .pv-road {
+        fill: #123b41;
+      }
+
+      .pv-road-line {
+        fill: none;
+        stroke: rgba(246, 236, 216, 0.24);
+        stroke-width: 4;
+        stroke-dasharray: 22 30;
+      }
+
+      .pv-glints path {
+        fill: none;
+        stroke: rgba(246, 236, 216, 0.14);
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+
+      .pv-haze {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(60% 26% at 56% 62%, rgba(246, 205, 149, 0.24), transparent 70%),
+          linear-gradient(180deg, transparent 40%, rgba(4, 23, 27, 0.28) 76%, rgba(3, 18, 22, 0.5) 100%);
+      }
+
+      .pv-grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.22;
+        mix-blend-mode: soft-light;
+        background-image:
+          repeating-linear-gradient(0deg, rgba(246, 236, 216, 0.05) 0 1px, transparent 1px 3px),
+          repeating-linear-gradient(90deg, rgba(3, 18, 22, 0.06) 0 1px, transparent 1px 4px);
+      }
+
+      #preview-badge {
+        display: none;
+        position: fixed;
+        top: 3px;
+        left: 50%;
+        z-index: 999;
+        transform: translateX(-50%);
+        padding: 1px 8px;
+        font: 600 8px/1.6 var(--font-display, monospace);
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(246, 236, 216, 0.32);
+        border: 1px solid rgba(246, 236, 216, 0.14);
+        pointer-events: none;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="preview-stage" aria-hidden="true">
+      <div class="pv-sky"></div>
+      <div class="pv-sun"></div>
+      <svg class="pv-scene" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <path class="pv-sea" d="M0 578 H1440 V900 H0Z" />
+        <g class="pv-glints">
+          <path d="M180 606h210M520 624h330M928 610h240M300 650h180M760 662h310M1060 646h210" />
+        </g>
+        <path
+          class="pv-headland"
+          d="M0 578 C92 554 190 548 292 560 C378 570 426 568 474 560 L474 578 H0Z"
+        />
+        <path
+          class="pv-cliff"
+          d="M1118 900 C1156 828 1178 752 1258 704 C1330 660 1404 642 1440 634 V900Z"
+        />
+        <path
+          class="pv-road"
+          d="M560 900 C600 790 650 730 660 660 C665 620 700 590 706 578 L744 578 C738 598 712 626 714 664 C718 738 780 800 840 900Z"
+        />
+        <path
+          class="pv-road-line"
+          d="M700 900 C710 800 700 740 700 680 C700 630 720 600 724 582"
+        />
+      </svg>
+      <div class="pv-haze"></div>
+      <div class="pv-grain"></div>
+    </div>
+
+    <span id="preview-badge">UI Preview</span>
+    <div id="preview-host"></div>
+
+    <script type="module" src="./ui-preview.ts"></script>
+  </body>
+</html>

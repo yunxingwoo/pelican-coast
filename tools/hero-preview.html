@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pelican Coast — hero rig preview</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --cream: #f4ead6;
+        --coral: #ff7a55;
+        --teal: #7fd8cd;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #1a2230;
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      #stage {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+      .frame {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        padding: 22px 26px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .eyebrow {
+        color: rgba(244, 234, 214, 0.66);
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+      }
+      .title {
+        margin-top: 6px;
+        color: var(--cream);
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 26px;
+        letter-spacing: 0.02em;
+      }
+      .title em {
+        color: var(--coral);
+        font-style: normal;
+      }
+      .readout {
+        display: flex;
+        gap: 18px;
+        color: rgba(244, 234, 214, 0.76);
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+      }
+      .readout b {
+        color: var(--teal);
+        font-weight: 600;
+      }
+      .hint {
+        align-self: flex-end;
+        color: rgba(244, 234, 214, 0.5);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="stage" aria-label="Pelican hero rig preview"></canvas>
+    <div class="frame">
+      <div>
+        <div class="eyebrow">Pelican Coast · hero rig</div>
+        <div class="title">The <em>Pelican</em> Courier</div>
+      </div>
+      <div class="readout">
+        <span>SPEED <b id="r-speed">0</b> km/h</span>
+        <span>STEER <b id="r-steer">0.00</b></span>
+        <span>LEAN <b id="r-lean">0.00</b></span>
+        <span>VIEW <b id="r-view">chase</b></span>
+      </div>
+      <div class="hint">1 chase · 2 front · 3 side · drag to orbit</div>
+    </div>
+    <script type="module" src="/tools/hero-preview.ts"></script>
+  </body>
+</html>
