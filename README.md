@@ -1,10 +1,29 @@
 # 鹈鹕海岸线 · Pelican Coast
 
-A stylized Three.js coastal cycling game. A pelican in a coral neckerchief pedals a vintage bicycle along a winding seaside road while wind, weather and the sun change around the ride.
+**一款基于 Three.js 的浏览器 3D 海岸骑行游戏。**
+
+一只系着珊瑚色围巾的白鹈鹕，骑着复古自行车，沿着被潮汐反复擦亮的环海公路骑两圈。海风、天气与光线一路变化，沿途收集海星贝壳，躲开浮木、落石和横穿公路的螃蟹。
+
+**在线试玩：** https://yunxingwoo.github.io/pelican-coast/  
+**源码仓库：** https://github.com/yunxingwoo/pelican-coast
 
 ![Pelican Coast](docs/screenshot.png)
 
-**Play in browser:** https://yunxingwoo.github.io/pelican-coast/
+## 中文介绍
+
+《鹈鹕海岸线》不是一段预渲染动画：鹈鹕、自行车、公路、悬崖、海浪、棕榈、灯塔、天空和音效，全部在浏览器里由代码实时生成，不加载任何外部模型或贴图。
+
+- **骑行与操控**：`W` / `↑` 蹬踏加速，`S` / `↓` 刹车，`A` `D` / `←` `→` 转向，`Shift` / `Space` 触发尾风冲刺；也可以直接拖动画面转向，移动端提供蹬踏/刹车按钮。
+- **一条会呼吸的海岸公路**：0.96 公里的闭合赛道，两圈计时；风向与阵风、晴/阴/雨/风暴/海雾、12 分钟昼夜循环会同时影响视野、路面和骑行手感。
+- **收集与挑战**：海星贝壳提升连击并补充冲刺，检查点与圈速奖励分数；撞上浮木、落石或螃蟹会损失爱心，三颗心用完结束本局。
+- **鹈鹕本身**：程序化骨骼与 IK 踩踏，五种镜头（追随 / 侧面 / 正面 / 电影运镜 / 鹈鹕第一人称）；`T` 展开层叠飞羽，`B` 摇响车铃，`N` 快进 3 小时，`U` 隐藏界面。
+- **技术栈**：Three.js r184、TypeScript、Vite；自定义天空/海洋 Shader、PMREM 海岸环境反射、程序化 WebAudio；项目通过 GitHub Actions 自动发布到 GitHub Pages。
+
+![展翅](docs/wings.png)
+
+## English overview
+
+*Pelican Coast* is a stylized Three.js coastal cycling game. A pelican in a coral neckerchief pedals a vintage bicycle along a winding seaside road while wind, weather and the sun change around the ride. Everything — the rider, bicycle, road, sea, sky, props and audio — is generated procedurally in the browser, with no external models, fonts, images or runtime network calls.
 
 ## Quick start
 
